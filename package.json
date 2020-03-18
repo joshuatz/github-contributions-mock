@@ -1,6 +1,10 @@
 {
 	"name": "github-contribution-mock",
 	"version": "0.1.0",
+	"author": {
+		"name": "Joshua Tzucker",
+		"url": "https://joshuatz.com"
+	},
 	"private": true,
 	"dependencies": {
 		"@testing-library/jest-dom": "^4.2.4",
