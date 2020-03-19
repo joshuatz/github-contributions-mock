@@ -3,18 +3,19 @@ import { chunkArr } from './general';
 /**
  *
  * @param {string} text Input text
- * @param {string} fontStr CSS font string
- * @param {object} resolution Resolution per character
+ * @param {'rgba' | 'greyscale' | 'blackandwhite'} [returnType]
+ * @param {string} [fontStr] CSS font string
+ * @param {object} [resolution] Resolution per character
  * @param {number} resolution.w
  * @param {number} resolution.h
- * @param {boolean} useCache Cache bitmaps
+ * @param {boolean} [useCache] Cache bitmaps
  */
 export const textToDataArr = (
 	text,
+	returnType = 'greyscale',
 	fontStr = '10px sans-serif',
 	resolution = { w: 10, h: 10 },
-	useCache = true,
-	asBits = true
+	useCache = true
 ) => {
 	// Hold data for returning
 	const dataByChar = [];
@@ -58,8 +59,10 @@ export const textToDataArr = (
 			dataArr.push(pixelArr);
 		}
 
-		if (asBits) {
+		if (returnType === 'blackandwhite') {
 			dataArr = rgbaArrToBitArr(dataArr);
+		} else if (returnType === 'greyscale') {
+			dataArr = rgbaArrToGrayscale(dataArr);
 		}
 
 		// Chunk array by width
@@ -69,7 +72,7 @@ export const textToDataArr = (
 		dataByChar.push(dataArr);
 	}
 
-	debugger;
+	console.log(dataByChar);
 	return dataByChar;
 };
 
@@ -84,6 +87,21 @@ export const rgbaArrToBitArr = rgbaArr => {
 		let y = 0.299 * subArr[0] + 0.587 * subArr[1] + 0.114 * subArr[2];
 		y = y * (subArr[3] / 255);
 		out.push(y < threshold ? 1 : 0);
+	}
+	return out;
+};
+
+/**
+ * Returns array where each pixel is 0-255
+ * @param {Array<Array<number>>} rgbaArr
+ * @returns {Array<number>}
+ */
+export const rgbaArrToGrayscale = rgbaArr => {
+	const out = [];
+	for (const subArr of rgbaArr) {
+		let y = 0.299 * subArr[0] + 0.587 * subArr[1] + 0.114 * subArr[2];
+		y = y * (subArr[3] / 255);
+		out.push(y);
 	}
 	return out;
 };

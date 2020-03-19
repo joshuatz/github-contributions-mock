@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import fontUtils from '../utils/font-utils';
+import { IntensityInput } from './IntensityInput';
 
-export const ControlForm = props => {
+export const ControlForm = ({ setGraph }) => {
 	const defaultFormState = {
 		toUpper: true,
 		textInput: 'Hello! 🎉',
-		shouldScroll: true
+		shouldScroll: true,
+		useTextIntensity: false,
+		fixedIntensity: 255
 	};
 	const [formState, setFormState] = useState(defaultFormState);
 
@@ -44,11 +47,32 @@ export const ControlForm = props => {
 					<span>Uppercase Text</span>
 				</label>
 
+				<label>
+					<input
+						type="checkbox"
+						id="useTextIntensity"
+						checked={formState.useTextIntensity}
+						onChange={mapFormChange}
+					/>
+					<span>Use intensity of Text</span>
+				</label>
+
+				<IntensityInput
+					intensity={formState.fixedIntensity}
+					disabled={formState.useTextIntensity}
+					setIntensity={evt => {
+						setFormState({
+							...formState,
+							fixedIntensity: evt.target.value
+						});
+					}}
+				/>
+
 				{/* Testing */}
 				<button
 					onClick={evt => {
 						evt.preventDefault();
-						fontUtils.textToDataArr(formState.textInput, 'asdf');
+						fontUtils.textToDataArr(formState.textInput, 'greyscale');
 					}}
 				>
 					Generate
