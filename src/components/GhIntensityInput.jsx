@@ -1,11 +1,12 @@
 import React from 'react';
+import { defaultGraphColors } from '../constants';
 
-export const IntensityInput = ({ intensity, setIntensity, disabled = false, rangeMax = 255 }) => {
+export const GhIntensityInput = ({ intensity, setIntensity, disabled = false }) => {
 	return (
 		<div className="intensityInput">
 			<div
 				style={{
-					backgroundColor: `rgba(25, 97, 39, ${intensity / rangeMax})`,
+					backgroundColor: `${defaultGraphColors[intensity]}`,
 					width: 12,
 					height: 12
 				}}
@@ -14,7 +15,7 @@ export const IntensityInput = ({ intensity, setIntensity, disabled = false, rang
 				<input
 					type="range"
 					min="0"
-					max={rangeMax}
+					max="4"
 					step={1}
 					value={intensity}
 					onChange={setIntensity}

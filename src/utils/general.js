@@ -13,20 +13,6 @@ export const chunkArr = (arr, chunkLength) => {
 };
 
 /**
- * @param {Date} startDate
- * @param {Array<Array<number>>} pixelMdArr
- * @param {'greyscale' | 'blackandwhite'} pixelType
- */
-export const pixelArrToContribCal = (startDate, pixelMdArr, pixelType = 'greyscale') => {
-	const contribsByDate = {};
-	//
-};
-
-const dateToYMD = date => {
-	return /([^T]*)/.exec(date.toISOString())[0];
-};
-
-/**
  * @param {number} min
  * @param {number} max
  * @param {number} width
@@ -58,4 +44,52 @@ export const generateDemoPattern = (min, max, width, height) => {
 	}
 
 	return output;
+};
+
+/**
+ * Scale down (or up) an array
+ * @param {Array<any>} arr Input array to scale. Can be multi-dimensional
+ * @param {number} minAllowed Min of range to scale to
+ * @param {number} maxAllowed Max of range to scale to
+ * @param {boolean} [round] Should output only be integers?
+ * @param {number} [min] Smallest value that appears anywhere in arr data
+ * @param {number} [max] Largest value that appears anywhere in arr data
+ * @example
+ * scaled = scaleArr([0, 2, 4], 0, 10);
+ * console.log(scaled);
+ * // > [0, 5, 10]
+ * @example
+ * // You can also invert the mapping
+ * scaled = scaleArr([0, 2, 4], 10, 0);
+ * console.log(scaled);
+ * // > [10, 5, 0]
+ */
+export const scaleArr = (arr, minAllowed, maxAllowed, round, min, max) => {
+	const getNums = arr => {
+		const singleDimArr = [];
+		arr.forEach(val => {
+			singleDimArr.push(...(Array.isArray(val) ? getNums(val) : [val]));
+		});
+		return singleDimArr;
+	};
+
+	if (typeof min !== 'number' || typeof max !== 'number') {
+		const allNums = getNums(arr);
+		max = Math.max(...allNums);
+		min = Math.min(...allNums);
+	}
+
+	return arr.map(val => {
+		if (Array.isArray(val)) {
+			return scaleArr(val, minAllowed, maxAllowed, round, min, max);
+		}
+
+		const scaled = ((maxAllowed - minAllowed) * (val - min)) / (max - min) + minAllowed;
+
+		if (Number.isNaN(scaled)) {
+			return minAllowed;
+		}
+
+		return !!round ? Math.round(scaled) : scaled;
+	});
 };

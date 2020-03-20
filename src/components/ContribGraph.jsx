@@ -1,14 +1,10 @@
 import React from 'react';
 
 /**
- * @typedef {{0: string, 1: string, 2: string, 3: string, 4: string}} Colors
- */
-
-/**
  *
  * @param {object} props
  * @param {Array<Array<number>>} props.points
- * @param {Colors} props.colors
+ * @param {ColorValMap} props.colors
  * @param {number} [props.margin]
  */
 export const ContribGraph = ({ points, colors, margin = 2 }) => {
@@ -33,7 +29,8 @@ export const ContribGraph = ({ points, colors, margin = 2 }) => {
 			<svg
 				style={{
 					width: '100%',
-					height: '150px'
+					// height: '150px,'
+					overflow: 'visible'
 				}}
 			>
 				{pointsToRects(points)}
