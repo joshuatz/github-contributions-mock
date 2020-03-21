@@ -13,7 +13,7 @@ function App() {
 	});
 
 	return (
-		<div className="App">
+		<div className="app">
 			<ControlForm setGraph={setGraphParams} />
 			<ContribGraph {...graphParams} />
 		</div>

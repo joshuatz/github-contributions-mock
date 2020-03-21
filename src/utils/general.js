@@ -93,3 +93,23 @@ export const scaleArr = (arr, minAllowed, maxAllowed, round, min, max) => {
 		return !!round ? Math.round(scaled) : scaled;
 	});
 };
+
+/**
+ *
+ * @param {Array<any>} arr
+ * @param {boolean} [isMdArr]
+ * @param {'left' | 'right'} [direction]
+ */
+export const shiftArr = (arr, isMdArr = false, direction = 'right') => {
+	if (isMdArr) {
+		return arr.map(subArr => {
+			return shiftArr(subArr, false, direction);
+		});
+	}
+
+	if (direction === 'right') {
+		return [arr[arr.length - 1], ...arr.slice(0, arr.length - 1)];
+	} else {
+		return [...arr.slice(1), arr[0]];
+	}
+};

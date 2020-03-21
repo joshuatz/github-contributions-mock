@@ -9,9 +9,12 @@ import { scaleArr } from '../utils/general';
 export const ControlForm = ({ setGraph }) => {
 	const defaultFormState = {
 		toUpper: true,
-		textInput: 'Hello! ⚡',
-		shouldScroll: true,
-		useTextIntensity: false,
+		// textInput: 'Hello! ⚡',
+		// textInput: 'L',
+		textInput: '💎💎',
+		// textInput: 'Test',
+		shouldScroll: false,
+		useTextIntensity: true,
 		fixedIntensity: 4
 	};
 	const [formState, setFormState] = useState(defaultFormState);
@@ -42,17 +45,22 @@ export const ControlForm = ({ setGraph }) => {
 				0: '#ebedf0',
 				1: `${defaultGraphColors[formState.fixedIntensity]}`
 			};
-			console.log(colors);
 			range = { min: 0, max: 1 };
 		}
 		const text = formState.toUpper ? formState.textInput.toUpperCase() : formState.textInput;
-		const chars = fontUtils.textToDataArr(text, colorScale, { w: 20, h: 9 }, '10px monospace');
+		const chars = fontUtils.textToDataArr(
+			text,
+			colorScale,
+			{ w: 12, h: 13 },
+			'11px "Lucida Console", Monaco, monospace'
+		);
 		const lastChar = chars[chars.length - 1];
 
 		const scaledPoints = lastChar ? scaleArr(lastChar, range.min, range.max, true) : [];
 		setGraph({
 			points: scaledPoints,
-			colors
+			colors,
+			animate: formState.shouldScroll
 		});
 	}, [formState, setGraph]);
 
@@ -62,62 +70,83 @@ export const ControlForm = ({ setGraph }) => {
 
 	return (
 		<div className="controlForm">
-			<form>
-				<label htmlFor="textInput">Text to Display</label>
-				<input
-					type="text"
-					id="textInput"
-					value={formState.textInput}
-					onChange={mapFormChange}
-					onKeyUp={generateFromForm}
-				/>
+			<form className="row">
+				<div className="row">
+					<div className="col s12 m9">
+						<label htmlFor="textInput">Text to Display</label>
+						<input
+							type="text"
+							id="textInput"
+							value={formState.textInput}
+							onChange={mapFormChange}
+							onKeyUp={generateFromForm}
+						/>
+					</div>
+					<div className="col s6 offset-s3 m3 center-align">
+						{/* Testing */}
+						<button
+							className="btn-large"
+							onClick={evt => {
+								evt.preventDefault();
+								generateFromForm();
+							}}
+						>
+							Generate
+						</button>
+					</div>
+				</div>
 
-				<label htmlFor="shouldScroll">
-					<input
-						type="checkbox"
-						id="shouldScroll"
-						checked={formState.shouldScroll}
-						onChange={mapFormChange}
+				<div className="row">
+					<div className="col s12 m6">
+						<label htmlFor="shouldScroll">
+							<input
+								type="checkbox"
+								id="shouldScroll"
+								checked={formState.shouldScroll}
+								onChange={mapFormChange}
+							/>
+							<span>Should text scroll / animate?</span>
+						</label>
+					</div>
+
+					<div className="col s12 m6">
+						<label>
+							<input type="checkbox" id="toUpper" checked={formState.toUpper} onChange={mapFormChange} />
+							<span>Uppercase Text</span>
+						</label>
+					</div>
+
+					<div className="col s12 m6">
+						<label>
+							<input
+								type="checkbox"
+								id="useTextIntensity"
+								checked={formState.useTextIntensity}
+								onChange={mapFormChange}
+							/>
+							<span>Use intensity of Text</span>
+						</label>
+					</div>
+				</div>
+
+				<div className="col s12 m6">
+					<GhIntensityInput
+						intensity={formState.fixedIntensity}
+						disabled={formState.useTextIntensity}
+						setIntensity={evt => {
+							setFormState({
+								...formState,
+								fixedIntensity: evt.target.value
+							});
+						}}
 					/>
-					<span>Should text scroll / animate?</span>
-				</label>
+				</div>
 
-				<label>
-					<input type="checkbox" id="toUpper" checked={formState.toUpper} onChange={mapFormChange} />
-					<span>Uppercase Text</span>
-				</label>
-
-				<label>
-					<input
-						type="checkbox"
-						id="useTextIntensity"
-						checked={formState.useTextIntensity}
-						onChange={mapFormChange}
-					/>
-					<span>Use intensity of Text</span>
-				</label>
-
-				<GhIntensityInput
-					intensity={formState.fixedIntensity}
-					disabled={formState.useTextIntensity}
-					setIntensity={evt => {
-						setFormState({
-							...formState,
-							fixedIntensity: evt.target.value
-						});
-					}}
-				/>
-
-				{/* Testing */}
-				<button
-					onClick={evt => {
-						evt.preventDefault();
-						generateFromForm();
-					}}
-				>
-					Generate
-				</button>
-				<canvas width={500} height={200}></canvas>
+				<div className="col s12 m6">
+					<div className="card" style={{ minHeight: 160, padding: 10 }}>
+						<canvas width={500} height={200}></canvas>
+					</div>
+				</div>
 			</form>
 		</div>
 	);

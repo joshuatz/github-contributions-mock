@@ -2,6 +2,8 @@ type SetGraphParams = Dispatch<
 	SetStateAction<{
 		points: number[][];
 		colors: { [key: number]: string };
+		margin?: number;
+		animate?: boolean;
 	}>
 >;
 

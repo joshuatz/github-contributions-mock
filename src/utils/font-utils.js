@@ -63,7 +63,8 @@ export const textToDataArr = (
 	canvContext.fillRect(0, 0, canvas.width, canvas.height);
 	// Fill text
 	canvContext.fillStyle = 'black';
-	canvContext.fillText(text, 1, 1, canvas.width);
+	// canvContext.fillText(text, 1, 3, canvas.width);
+	canvContext.fillText(text, 1, 3);
 	// clamped to 255, 4 values (rgba) per pixel
 	const uint8ClampedArr = canvContext.getImageData(0, 0, canvas.width, canvas.height).data;
 
@@ -112,12 +113,13 @@ export const rgbaArrToBitArr = rgbaArr => {
 /**
  * Returns array where each pixel is 0-255
  * @param {Array<Array<number>>} rgbaArr
+ * @param {{r: number, g: number, b: number}} [weights]
  * @returns {Array<number>}
  */
-export const rgbaArrToGrayscale = rgbaArr => {
+export const rgbaArrToGrayscale = (rgbaArr, weights = { r: 0.299, g: 0.587, b: 0.114 }) => {
 	const out = [];
 	for (const subArr of rgbaArr) {
-		let y = 0.299 * subArr[0] + 0.587 * subArr[1] + 0.114 * subArr[2];
+		let y = weights.r * subArr[0] + weights.g * subArr[1] + weights.b * subArr[2];
 		y = y * (subArr[3] / 255);
 		out.push(y);
 	}

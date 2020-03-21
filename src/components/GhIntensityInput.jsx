@@ -3,15 +3,36 @@ import { defaultGraphColors } from '../constants';
 
 export const GhIntensityInput = ({ intensity, setIntensity, disabled = false }) => {
 	return (
-		<div className="intensityInput">
+		<div
+			className="intensityInput row"
+			style={{
+				border: '1px solid var(--lightBorder)'
+			}}
+		>
+			<div className="row">
+				<div className="col s10 offset-s1 center-align">
+					<h4>Manual Color Override</h4>
+				</div>
+			</div>
 			<div
+				className="col s1 center-align"
 				style={{
-					backgroundColor: `${defaultGraphColors[intensity]}`,
-					width: 12,
-					height: 12
+					fontSize: 30
 				}}
-			></div>
-			<p className="range-field">
+			>
+				{intensity}
+			</div>
+			<div className="col s2 center-align">
+				<div
+					style={{
+						backgroundColor: `${defaultGraphColors[intensity]}`,
+						width: 30,
+						height: 30,
+						margin: 'auto'
+					}}
+				/>
+			</div>
+			<div className="range-field col s9 valign-wrapper">
 				<input
 					type="range"
 					min="0"
@@ -21,7 +42,7 @@ export const GhIntensityInput = ({ intensity, setIntensity, disabled = false }) 
 					onChange={setIntensity}
 					disabled={disabled}
 				/>
-			</p>
+			</div>
 		</div>
 	);
 };

@@ -2,5 +2,11 @@
 	"editor.insertSpaces": false,
 	"editor.tabSize": 4,
 	"editor.formatOnSave": true,
-	"javascript.implicitProjectConfig.checkJs": true
+	"javascript.implicitProjectConfig.checkJs": true,
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
 }
