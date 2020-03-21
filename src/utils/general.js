@@ -113,3 +113,107 @@ export const shiftArr = (arr, isMdArr = false, direction = 'right') => {
 		return [...arr.slice(1), arr[0]];
 	}
 };
+
+/**
+ * @param {Array<Array<number>>} mdArr
+ * @param {number} [emptyVal]
+ */
+export const trimMdArr = (mdArr, emptyVal = 0) => {
+	// @TODO optimize?
+
+	if (!mdArr.length) {
+		return mdArr;
+	}
+
+	/** @param {Array<number>} arr */
+	const isEmpty = arr => {
+		if (emptyVal === 0) {
+			return Math.max(...arr) === 0;
+		} else {
+			for (const val of arr) {
+				if (val !== emptyVal) {
+					return false;
+				}
+			}
+			return true;
+		}
+	};
+
+	// Trim rows, starting at top
+	for (let y = 0; y < mdArr.length; y++) {
+		const row = mdArr[y];
+		if (isEmpty(row)) {
+			mdArr.splice(y, 1);
+			--y;
+		} else {
+			break;
+		}
+	}
+	// Trim rows, starting at bottom
+	for (let y = mdArr.length - 1; y >= 0; y--) {
+		const row = mdArr[y];
+		if (isEmpty(row)) {
+			mdArr.splice(y, 1);
+		} else {
+			break;
+		}
+	}
+
+	// Assume equal length rows, where mdArr[0].length = mdArr[any].length
+	// Trim cols, starting at left
+	for (let x = 0; x < mdArr[0].length; x++) {
+		const colVals = mdArr.map(row => row[x]);
+		if (isEmpty(colVals)) {
+			mdArr.forEach(row => {
+				row.shift();
+			});
+			// Move pointer back
+			--x;
+		} else {
+			break;
+		}
+	}
+	// Trim cols, starting at right
+	for (let x = mdArr[0].length - 1; x >= 0; x--) {
+		const colVals = mdArr.map(row => row[x]);
+		if (isEmpty(colVals)) {
+			mdArr.forEach(row => {
+				row.pop();
+			});
+		} else {
+			break;
+		}
+	}
+
+	return mdArr;
+};
+
+/**
+ * @param {Array<Array<number>>} mdArr
+ * @param {any} [padThing]
+ */
+export const padArr = (mdArr, padX, padY, padThing = 0) => {
+	if (padX) {
+		mdArr.forEach(row => {
+			let iter = 0;
+			while (iter < padX) {
+				row.unshift(padThing);
+				row.push(padThing);
+				iter++;
+			}
+		});
+	}
+
+	if (padY) {
+		let iter = 0;
+		// Assume equal length rows
+		const emptyArr = Array(mdArr[0].length).fill(padThing);
+		while (iter < padY) {
+			mdArr.unshift(emptyArr);
+			mdArr.push(emptyArr);
+			iter++;
+		}
+	}
+
+	return mdArr;
+};

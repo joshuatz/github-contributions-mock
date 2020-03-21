@@ -107,6 +107,8 @@ export const ContribGraph = ({ points, colors, margin = 2, animate = true }) => 
 						// height: '150px,'
 						overflow: 'hidden'
 					}}
+					viewBox={`0 0 ${finPoints[0] ? finPoints[0].length * (rectSize.w + margin) : 0} ${finPoints.length *
+						(rectSize.h + margin)}`}
 				>
 					{pointsToRects(finPoints)}
 				</svg>

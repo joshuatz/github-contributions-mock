@@ -1,4 +1,4 @@
-import { chunkArr } from './general';
+import { chunkArr, trimMdArr, padArr } from './general';
 
 /**
  *
@@ -19,6 +19,14 @@ export const textToDataArr = (
 	useCache = true,
 	splitByChar = false
 ) => {
+	const RENDER_PADDING = {
+		w: 100,
+		h: 20
+	};
+	const OUTPUT_PADDING = {
+		w: 2,
+		h: 1
+	};
 	const output = [];
 	// Get around .split() UTF16 limitation
 	const chars = [...text];
@@ -26,6 +34,15 @@ export const textToDataArr = (
 	// Edge case - empty text
 	if (!chars.length) {
 		return output;
+	}
+
+	const fontStrPxMatch = /(\d+)px/.exec(fontStr);
+	if (fontStrPxMatch) {
+		const fontStrPx = parseInt(fontStrPxMatch[0], 10);
+		resolution = {
+			w: fontStrPx,
+			h: fontStrPx
+		};
 	}
 
 	if (splitByChar) {
@@ -47,8 +64,8 @@ export const textToDataArr = (
 	if (!canvas) {
 		canvas = document.createElement('canvas');
 	}
-	canvas.width = resolution.w * chars.length;
-	canvas.height = resolution.h;
+	canvas.width = resolution.w * chars.length + RENDER_PADDING.w;
+	canvas.height = resolution.h + RENDER_PADDING.h;
 
 	// Setup canvas context
 	const canvContext = canvas.getContext('2d');
@@ -64,7 +81,7 @@ export const textToDataArr = (
 	// Fill text
 	canvContext.fillStyle = 'black';
 	// canvContext.fillText(text, 1, 3, canvas.width);
-	canvContext.fillText(text, 1, 3);
+	canvContext.fillText(text, 1, 6);
 	// clamped to 255, 4 values (rgba) per pixel
 	const uint8ClampedArr = canvContext.getImageData(0, 0, canvas.width, canvas.height).data;
 
@@ -80,15 +97,22 @@ export const textToDataArr = (
 		dataArr.push(pixelArr);
 	}
 
+	let emptyThing = 0;
 	if (returnType === 'blackandwhite') {
 		dataArr = rgbaArrToBitArr(dataArr);
 	} else if (returnType === 'greyscale') {
 		dataArr = rgbaArrToGrayscale(dataArr);
+		emptyThing = 255;
 	}
 
 	// Chunk array by width
 	// canvas returns single array (10 x 10 grid returns 1x100 array), but I'd like data by row (10 x (1 x 10))
 	dataArr = chunkArr(dataArr, canvas.width);
+
+	// Trim out empty padding
+	dataArr = trimMdArr(dataArr, emptyThing);
+	// Add minimal padding
+	dataArr = padArr(dataArr, OUTPUT_PADDING.w, OUTPUT_PADDING.h, emptyThing);
 
 	output.push(dataArr);
 
