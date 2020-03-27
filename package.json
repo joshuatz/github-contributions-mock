@@ -5,6 +5,7 @@
 		"name": "Joshua Tzucker",
 		"url": "https://joshuatz.com"
 	},
+	"license": "MIT",
 	"private": true,
 	"dependencies": {
 		"@testing-library/jest-dom": "^4.2.4",
