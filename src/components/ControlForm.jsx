@@ -11,6 +11,9 @@ export const ControlForm = ({ setGraph }) => {
 		toUpper: true,
 		textInput: 'Welcome! ⚡💎',
 		shouldScroll: false,
+		// prettier-ignore
+		/** @type {'rtl' | 'ltr'} */
+		scrollDirection: ('rtl'),
 		useTextIntensity: true,
 		fixedIntensity: 4
 	};
@@ -57,7 +60,8 @@ export const ControlForm = ({ setGraph }) => {
 		setGraph({
 			points: scaledPoints,
 			colors,
-			animate: formState.shouldScroll
+			animate: formState.shouldScroll,
+			scrollDirection: formState.scrollDirection
 		});
 	}, [formState, setGraph]);
 
@@ -107,6 +111,30 @@ export const ControlForm = ({ setGraph }) => {
 								<span>Should text scroll / animate?</span>
 							</label>
 						</div>
+
+						{formState.shouldScroll && (
+							<div className="col s12 m6">
+								<div className="switch">
+									<label>
+										LTR
+										<input
+											type="checkbox"
+											checked={formState.scrollDirection === 'rtl'}
+											onChange={() => {
+												const scrollDirection =
+													formState.scrollDirection === 'rtl' ? 'ltr' : 'rtl';
+												setFormState({
+													...formState,
+													scrollDirection
+												});
+											}}
+										/>
+										<span className="lever"></span>
+										RTL
+									</label>
+								</div>
+							</div>
+						)}
 
 						<div className="col s12 m6">
 							<label>

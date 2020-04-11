@@ -1,11 +1,13 @@
-type SetGraphParams = React.Dispatch<
-	React.SetStateAction<{
-		points: number[][];
-		colors: { [key: number]: string };
-		margin?: number;
-		animate?: boolean;
-	}>
->;
+type SetGraphParams = React.Dispatch<React.SetStateAction<ContribGraphProps>>;
+
+interface ContribGraphProps {
+	points: number[][];
+	colors: ColorValMap;
+	emptyVal?: number;
+	margin?: number;
+	animate?: boolean;
+	scrollDirection?: 'ltr' | 'rtl';
+}
 
 type ColorValMap = Record<number, string>;
 

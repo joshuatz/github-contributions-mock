@@ -5,7 +5,7 @@ import { useElemSize } from '../utils/hooks';
 
 const ANIMATION_STEP_DELAY_MS = 200;
 const COLS_PER_MONTH = 4;
-const MIN_MONTHS = 5;
+const MIN_MONTHS = 6;
 
 /** @type {Record<string, React.CSSProperties>} */
 const styles = {
@@ -27,15 +27,9 @@ const styles = {
 };
 
 /**
- *
- * @param {object} props
- * @param {Array<Array<number>>} props.points
- * @param {ColorValMap} props.colors
- * @param {number} [props.emptyVal]
- * @param {number} [props.margin]
- * @param {boolean} [props.animate]
+ * @param {ContribGraphProps} props
  */
-export const ContribGraph = ({ points, colors, emptyVal = 0, margin = 2, animate = true }) => {
+export const ContribGraph = ({ points, colors, emptyVal = 0, margin = 2, animate = true, scrollDirection = 'rtl' }) => {
 	let animationTimer;
 	const rectSize = { w: 10, h: 10 };
 	const [finPoints, setFinPoints] = useState(points);
@@ -86,7 +80,8 @@ export const ContribGraph = ({ points, colors, emptyVal = 0, margin = 2, animate
 
 	if (animate) {
 		const timerId = setInterval(() => {
-			const updatedPoints = shiftArr(finPoints, true, 'right');
+			const shiftDir = scrollDirection === 'ltr' ? 'right' : 'left';
+			const updatedPoints = shiftArr(finPoints, true, shiftDir);
 			setFinPoints([...updatedPoints]);
 		}, ANIMATION_STEP_DELAY_MS);
 		animationTimer = timerId;
