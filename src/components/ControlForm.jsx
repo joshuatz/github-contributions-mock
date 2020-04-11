@@ -1,6 +1,6 @@
+// @ts-check
 import React, { useState, useCallback } from 'react';
 import fontUtils from '../utils/font-utils';
-import { IntensityInput } from './IntensityInput';
 import { GhIntensityInput } from './GhIntensityInput';
 import { defaultGraphColors } from '../constants';
 import { scaleArr } from '../utils/general';
@@ -9,10 +9,7 @@ import { scaleArr } from '../utils/general';
 export const ControlForm = ({ setGraph }) => {
 	const defaultFormState = {
 		toUpper: true,
-		// textInput: 'Hello! ⚡',
-		// textInput: 'L',
-		textInput: '💎💎',
-		// textInput: 'Test',
+		textInput: 'Welcome! ⚡💎',
 		shouldScroll: false,
 		useTextIntensity: true,
 		fixedIntensity: 4
@@ -20,7 +17,7 @@ export const ControlForm = ({ setGraph }) => {
 	const [formState, setFormState] = useState(defaultFormState);
 
 	/** @param {React.ChangeEvent<HTMLInputElement>} evt */
-	const mapFormChange = evt => {
+	const mapFormChange = (evt) => {
 		/** @type {string | boolean} */
 		let value = evt.target.value;
 
@@ -86,7 +83,7 @@ export const ControlForm = ({ setGraph }) => {
 						{/* Testing */}
 						<button
 							className="btn-large"
-							onClick={evt => {
+							onClick={(evt) => {
 								evt.preventDefault();
 								generateFromForm();
 							}}
@@ -96,53 +93,62 @@ export const ControlForm = ({ setGraph }) => {
 					</div>
 				</div>
 
-				<div className="row">
+				{/* Settings Wrapper */}
+				<div className="row" style={{ minHeight: 134, marginBottom: 0 }}>
 					<div className="col s12 m6">
-						<label htmlFor="shouldScroll">
-							<input
-								type="checkbox"
-								id="shouldScroll"
-								checked={formState.shouldScroll}
-								onChange={mapFormChange}
-							/>
-							<span>Should text scroll / animate?</span>
-						</label>
-					</div>
+						<div className="col s12 m6">
+							<label htmlFor="shouldScroll">
+								<input
+									type="checkbox"
+									id="shouldScroll"
+									checked={formState.shouldScroll}
+									onChange={mapFormChange}
+								/>
+								<span>Should text scroll / animate?</span>
+							</label>
+						</div>
 
-					<div className="col s12 m6">
-						<label>
-							<input type="checkbox" id="toUpper" checked={formState.toUpper} onChange={mapFormChange} />
-							<span>Uppercase Text</span>
-						</label>
-					</div>
+						<div className="col s12 m6">
+							<label>
+								<input
+									type="checkbox"
+									id="toUpper"
+									checked={formState.toUpper}
+									onChange={mapFormChange}
+								/>
+								<span>Uppercase Text</span>
+							</label>
+						</div>
 
-					<div className="col s12 m6">
-						<label>
-							<input
-								type="checkbox"
-								id="useTextIntensity"
-								checked={formState.useTextIntensity}
-								onChange={mapFormChange}
-							/>
-							<span>Use intensity of Text</span>
-						</label>
+						<div className="col s12 m6">
+							<label>
+								<input
+									type="checkbox"
+									id="useTextIntensity"
+									checked={formState.useTextIntensity}
+									onChange={mapFormChange}
+								/>
+								<span>Use intensity of Text</span>
+							</label>
+						</div>
 					</div>
+					{!formState.useTextIntensity && (
+						<div className="col s12 m6">
+							<GhIntensityInput
+								intensity={formState.fixedIntensity}
+								disabled={formState.useTextIntensity}
+								setIntensity={(evt) => {
+									setFormState({
+										...formState,
+										fixedIntensity: evt.target.value
+									});
+								}}
+							/>
+						</div>
+					)}
 				</div>
 
-				<div className="col s12 m6">
-					<GhIntensityInput
-						intensity={formState.fixedIntensity}
-						disabled={formState.useTextIntensity}
-						setIntensity={evt => {
-							setFormState({
-								...formState,
-								fixedIntensity: evt.target.value
-							});
-						}}
-					/>
-				</div>
-
-				<div className="col s12 m6">
+				<div className="col s12 m6" style={{ display: 'none' }}>
 					<div className="card" style={{ minHeight: 160, padding: 10 }}>
 						<canvas width={500} height={200}></canvas>
 					</div>

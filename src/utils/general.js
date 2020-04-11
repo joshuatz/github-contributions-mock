@@ -65,9 +65,9 @@ export const generateDemoPattern = (min, max, width, height) => {
  * // > [10, 5, 0]
  */
 export const scaleArr = (arr, minAllowed, maxAllowed, round, min, max) => {
-	const getNums = arr => {
+	const getNums = (arr) => {
 		const singleDimArr = [];
-		arr.forEach(val => {
+		arr.forEach((val) => {
 			singleDimArr.push(...(Array.isArray(val) ? getNums(val) : [val]));
 		});
 		return singleDimArr;
@@ -79,7 +79,7 @@ export const scaleArr = (arr, minAllowed, maxAllowed, round, min, max) => {
 		min = Math.min(...allNums);
 	}
 
-	return arr.map(val => {
+	return arr.map((val) => {
 		if (Array.isArray(val)) {
 			return scaleArr(val, minAllowed, maxAllowed, round, min, max);
 		}
@@ -102,7 +102,7 @@ export const scaleArr = (arr, minAllowed, maxAllowed, round, min, max) => {
  */
 export const shiftArr = (arr, isMdArr = false, direction = 'right') => {
 	if (isMdArr) {
-		return arr.map(subArr => {
+		return arr.map((subArr) => {
 			return shiftArr(subArr, false, direction);
 		});
 	}
@@ -126,7 +126,7 @@ export const trimMdArr = (mdArr, emptyVal = 0) => {
 	}
 
 	/** @param {Array<number>} arr */
-	const isEmpty = arr => {
+	const isEmpty = (arr) => {
 		if (emptyVal === 0) {
 			return Math.max(...arr) === 0;
 		} else {
@@ -162,9 +162,9 @@ export const trimMdArr = (mdArr, emptyVal = 0) => {
 	// Assume equal length rows, where mdArr[0].length = mdArr[any].length
 	// Trim cols, starting at left
 	for (let x = 0; x < mdArr[0].length; x++) {
-		const colVals = mdArr.map(row => row[x]);
+		const colVals = mdArr.map((row) => row[x]);
 		if (isEmpty(colVals)) {
-			mdArr.forEach(row => {
+			mdArr.forEach((row) => {
 				row.shift();
 			});
 			// Move pointer back
@@ -175,9 +175,9 @@ export const trimMdArr = (mdArr, emptyVal = 0) => {
 	}
 	// Trim cols, starting at right
 	for (let x = mdArr[0].length - 1; x >= 0; x--) {
-		const colVals = mdArr.map(row => row[x]);
+		const colVals = mdArr.map((row) => row[x]);
 		if (isEmpty(colVals)) {
-			mdArr.forEach(row => {
+			mdArr.forEach((row) => {
 				row.pop();
 			});
 		} else {
@@ -194,7 +194,7 @@ export const trimMdArr = (mdArr, emptyVal = 0) => {
  */
 export const padArr = (mdArr, padX, padY, padThing = 0) => {
 	if (padX) {
-		mdArr.forEach(row => {
+		mdArr.forEach((row) => {
 			let iter = 0;
 			while (iter < padX) {
 				row.unshift(padThing);
@@ -217,3 +217,8 @@ export const padArr = (mdArr, padX, padY, padThing = 0) => {
 
 	return mdArr;
 };
+
+// prettier-ignore
+/* eslint-disable  */
+export const hashCode =  (e) => {let t=0;if(0==e.length)return t;for(let n=0;n<e.length;n++){t=(t<<5)-t+e.charCodeAt(n),t&=t}return t}
+/* eslint-enable */

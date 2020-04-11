@@ -1,8 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { monthsAbbr } from '../constants';
 import { shiftArr } from '../utils/general';
+import { useElemSize } from '../utils/hooks';
 
 const ANIMATION_STEP_DELAY_MS = 200;
+
+/** @type {Record<string, React.CSSProperties>} */
+const styles = {
+	contribGraph: {
+		border: '1px solid #d1d5da',
+		padding: 4
+	},
+	monthsWrapper: {
+		paddingLeft: 4,
+		overflowX: 'hidden',
+		width: '100%'
+	},
+	month: {
+		fontSize: 10,
+		fill: '#767676',
+		marginRight: 45,
+		display: 'inline'
+	}
+};
 
 /**
  *
@@ -21,20 +41,24 @@ export const ContribGraph = ({ points, colors, margin = 2, animate = true }) => 
 	/** @type {React.MutableRefObject<SVGSVGElement>} */
 	const containerRef = useRef(null);
 
+	const containerSize = useElemSize(containerRef);
+	console.log(containerSize);
+	const numMonths = containerSize.width / (16 + 45);
+
 	const getDisplayColCount = () => {
 		const pixelWidth = containerRef.current.getBoundingClientRect().width;
 		return Math.round(pixelWidth / (rectSize.w + margin));
 	};
 
 	/** @param {Array<Array<number>>} inputPoints */
-	const pointsToRects = inputPoints => {
+	const pointsToRects = (inputPoints) => {
 		console.log('pointsToRects called - ', inputPoints);
 		let colCounter = 0;
 		let rowCounter = 0;
-		return inputPoints.map(row => {
+		return inputPoints.map((row) => {
 			rowCounter++;
 			colCounter = 0;
-			return row.map(pointVal => {
+			return row.map((pointVal) => {
 				const currX = colCounter * (rectSize.w + margin);
 				const currY = (rowCounter - 1) * (rectSize.h + margin);
 				colCounter++;
@@ -92,23 +116,32 @@ export const ContribGraph = ({ points, colors, margin = 2, animate = true }) => 
 
 	return (
 		<div style={{ padding: 10 }}>
-			<div className="contribGraph">
-				<div className="monthsWrapper">
-					{monthsAbbr.map(abbrev => (
-						<div key={abbrev} className="month">
-							{abbrev}
-						</div>
-					))}
+			<div className="contribGraph" style={styles.contribGraph}>
+				<div className="monthsWrapper" style={styles.monthsWrapper}>
+					{(function () {
+						const output = [];
+						let abbrevPointer = 0;
+						for (let x = 0; x < numMonths; x++) {
+							const abbrev = monthsAbbr[abbrevPointer];
+							output.push(
+								<div key={`${abbrev}_${x}`} style={styles.month}>
+									{abbrev}
+								</div>
+							);
+							abbrevPointer = abbrevPointer < monthsAbbr.length - 1 ? abbrevPointer + 1 : 0;
+						}
+						return output;
+					})()}
 				</div>
 				<svg
 					ref={containerRef}
 					style={{
 						width: '100%',
-						// height: '150px,'
 						overflow: 'hidden'
 					}}
-					viewBox={`0 0 ${finPoints[0] ? finPoints[0].length * (rectSize.w + margin) : 0} ${finPoints.length *
-						(rectSize.h + margin)}`}
+					viewBox={`0 0 ${finPoints[0] ? finPoints[0].length * (rectSize.w + margin) : 0} ${
+						finPoints.length * (rectSize.h + margin)
+					}`}
 				>
 					{pointsToRects(finPoints)}
 				</svg>

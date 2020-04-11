@@ -11,7 +11,7 @@ export const GhIntensityInput = ({ intensity, setIntensity, disabled = false }) 
 		>
 			<div className="row">
 				<div className="col s10 offset-s1 center-align">
-					<h4>Manual Color Override</h4>
+					<p className="flow-text">Manual Color Override</p>
 				</div>
 			</div>
 			<div

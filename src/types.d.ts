@@ -1,5 +1,5 @@
-type SetGraphParams = Dispatch<
-	SetStateAction<{
+type SetGraphParams = React.Dispatch<
+	React.SetStateAction<{
 		points: number[][];
 		colors: { [key: number]: string };
 		margin?: number;

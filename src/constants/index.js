@@ -23,3 +23,5 @@ export const monthsFull = [
 ];
 
 export const monthsAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+export const appPrefix = 'contribmock';

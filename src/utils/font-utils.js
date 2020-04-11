@@ -1,4 +1,5 @@
-import { chunkArr, trimMdArr, padArr } from './general';
+import { chunkArr, trimMdArr, padArr, hashCode } from './general';
+import { appPrefix } from '../constants';
 
 /**
  *
@@ -29,6 +30,7 @@ export const textToDataArr = (
 	};
 	const output = [];
 	// Get around .split() UTF16 limitation
+	// @ts-ignore
 	const chars = [...text];
 
 	// Edge case - empty text
@@ -37,6 +39,8 @@ export const textToDataArr = (
 	}
 
 	const fontStrPxMatch = /(\d+)px/.exec(fontStr);
+	const cacheKey = appPrefix + hashCode(`${fontStr}_${text}_${returnType}`).toString();
+
 	if (fontStrPxMatch) {
 		const fontStrPx = parseInt(fontStrPxMatch[0], 10);
 		resolution = {
@@ -49,14 +53,15 @@ export const textToDataArr = (
 		// Hold data for returning
 		const dataByChar = [];
 		for (const char of chars) {
-			const cacheKey = `${fontStr}_${char}`;
-			if (useCache && typeof window[cacheKey]) {
-				dataByChar.push(window[cacheKey]);
-			} else {
-				dataByChar.push(textToDataArr(char, returnType, resolution, fontStr, useCache, false));
-			}
+			dataByChar.push(textToDataArr(char, returnType, resolution, fontStr, useCache, false));
 		}
 		return dataByChar;
+	}
+
+	if (useCache) {
+		if (Array.isArray(window[cacheKey])) {
+			return window[cacheKey];
+		}
 	}
 
 	// Setup a canvas element
@@ -116,6 +121,11 @@ export const textToDataArr = (
 
 	output.push(dataArr);
 
+	if (useCache) {
+		window[cacheKey] = output;
+		console.log(cacheKey);
+	}
+
 	return output;
 };
 
@@ -123,7 +133,7 @@ export const textToDataArr = (
  *
  * @param {Array<Array<number>>} rgbaArr
  */
-export const rgbaArrToBitArr = rgbaArr => {
+export const rgbaArrToBitArr = (rgbaArr) => {
 	const threshold = 172;
 	const out = [];
 	for (const subArr of rgbaArr) {

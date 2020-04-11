@@ -6,18 +6,8 @@
 .app {
 	padding: 10px;
 }
-.contribGraph {
-	border: 1px solid #d1d5da;
-	padding: 4px;
-}
-.monthsWrapper {
-	padding-left: 4px;
-	overflow-x: hidden;
-	width: 100%;
-}
-.monthsWrapper .month {
-	font-size: 10px;
-	fill: #767676;
-	margin-right: 45px;
-	display: inline;
+
+/** Materialize Overrides */
+.row {
+	margin-bottom: 8px;
 }
