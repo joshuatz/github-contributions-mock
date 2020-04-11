@@ -4,6 +4,8 @@ import { shiftArr } from '../utils/general';
 import { useElemSize } from '../utils/hooks';
 
 const ANIMATION_STEP_DELAY_MS = 200;
+const COLS_PER_MONTH = 4;
+const MIN_MONTHS = 5;
 
 /** @type {Record<string, React.CSSProperties>} */
 const styles = {
@@ -14,13 +16,13 @@ const styles = {
 	monthsWrapper: {
 		paddingLeft: 4,
 		overflowX: 'hidden',
-		width: '100%'
+		width: '100%',
+		display: 'flex'
 	},
 	month: {
 		fontSize: 10,
 		fill: '#767676',
-		marginRight: 45,
-		display: 'inline'
+		margin: 'auto'
 	}
 };
 
@@ -29,40 +31,45 @@ const styles = {
  * @param {object} props
  * @param {Array<Array<number>>} props.points
  * @param {ColorValMap} props.colors
+ * @param {number} [props.emptyVal]
  * @param {number} [props.margin]
  * @param {boolean} [props.animate]
  */
-export const ContribGraph = ({ points, colors, margin = 2, animate = true }) => {
+export const ContribGraph = ({ points, colors, emptyVal = 0, margin = 2, animate = true }) => {
 	let animationTimer;
 	const rectSize = { w: 10, h: 10 };
 	const [finPoints, setFinPoints] = useState(points);
-	const [animateTimer, setAnimateTimer] = useState(null);
-	const colCount = points[0] ? points[0].length : 0;
 	/** @type {React.MutableRefObject<SVGSVGElement>} */
 	const containerRef = useRef(null);
-
 	const containerSize = useElemSize(containerRef);
-	console.log(containerSize);
-	const numMonths = containerSize.width / (16 + 45);
 
-	const getDisplayColCount = () => {
-		const pixelWidth = containerRef.current.getBoundingClientRect().width;
-		return Math.round(pixelWidth / (rectSize.w + margin));
-	};
+	// Responsive SVG calculations
+	const pointsColCount = finPoints[0] ? finPoints[0].length : 0;
+	const minCols = MIN_MONTHS * COLS_PER_MONTH;
+	const maxCols = Math.round(containerSize.width / (rectSize.w + margin));
+	const displayColCount = Math.min(Math.max(pointsColCount, minCols), maxCols);
+	const numMonths = Math.round(displayColCount / COLS_PER_MONTH);
+	console.log({
+		pointsColCount,
+		minCols,
+		maxCols,
+		displayColCount,
+		numMonths
+	});
 
 	/** @param {Array<Array<number>>} inputPoints */
 	const pointsToRects = (inputPoints) => {
 		console.log('pointsToRects called - ', inputPoints);
-		let colCounter = 0;
 		let rowCounter = 0;
 		return inputPoints.map((row) => {
 			rowCounter++;
-			colCounter = 0;
-			return row.map((pointVal) => {
+			const rowCells = [];
+			for (let colCounter = 0; colCounter < displayColCount; colCounter++) {
 				const currX = colCounter * (rectSize.w + margin);
 				const currY = (rowCounter - 1) * (rectSize.h + margin);
-				colCounter++;
-				return (
+				let pointVal = row[colCounter];
+				pointVal = typeof pointVal === 'undefined' ? emptyVal : pointVal;
+				rowCells.push(
 					<rect
 						key={`r${rowCounter}c${colCounter}`}
 						width={rectSize.w}
@@ -72,7 +79,8 @@ export const ContribGraph = ({ points, colors, margin = 2, animate = true }) => 
 						x={currX}
 					/>
 				);
-			});
+			}
+			return rowCells;
 		});
 	};
 
@@ -82,25 +90,9 @@ export const ContribGraph = ({ points, colors, margin = 2, animate = true }) => 
 			setFinPoints([...updatedPoints]);
 		}, ANIMATION_STEP_DELAY_MS);
 		animationTimer = timerId;
-		// setAnimateTimer(timerId);
 	} else if (animationTimer) {
 		clearInterval(animationTimer);
-		// setAnimateTimer(null);
 	}
-
-	// useEffect(() => {
-	// 	if (!animate) {
-	// 		clearInterval(animateTimer);
-	// 	}
-	// }, [animate, animateTimer]);
-
-	// useEffect(() => {
-	// 	return function cleanup() {
-	// 		if (animateTimer) {
-	// 			clearInterval(animateTimer);
-	// 		}
-	// 	};
-	// });
 
 	useEffect(() => {
 		return function cleanup() {
@@ -124,7 +116,7 @@ export const ContribGraph = ({ points, colors, margin = 2, animate = true }) => 
 						for (let x = 0; x < numMonths; x++) {
 							const abbrev = monthsAbbr[abbrevPointer];
 							output.push(
-								<div key={`${abbrev}_${x}`} style={styles.month}>
+								<div key={`${abbrev}_${x}`} style={styles.month} className="month">
 									{abbrev}
 								</div>
 							);
@@ -139,7 +131,7 @@ export const ContribGraph = ({ points, colors, margin = 2, animate = true }) => 
 						width: '100%',
 						overflow: 'hidden'
 					}}
-					viewBox={`0 0 ${finPoints[0] ? finPoints[0].length * (rectSize.w + margin) : 0} ${
+					viewBox={`0 0 ${displayColCount * (rectSize.w + margin)} ${
 						finPoints.length * (rectSize.h + margin)
 					}`}
 				>
