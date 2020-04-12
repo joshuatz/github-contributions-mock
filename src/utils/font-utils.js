@@ -1,4 +1,4 @@
-import { chunkArr, trimMdArr, padArr, hashCode } from './general';
+import { chunkArr, trimMdArr, padArr, hashCode, makeFilledMdArr } from './general';
 import { appPrefix } from '../constants';
 
 /**
@@ -28,14 +28,14 @@ export const textToDataArr = (
 		w: 2,
 		h: 1
 	};
-	const output = [];
+	const emptyThing = returnType === 'blackandwhite' ? 0 : 255;
 	// Get around .split() UTF16 limitation
 	// @ts-ignore
 	const chars = [...text];
 
 	// Edge case - empty text
 	if (!chars.length) {
-		return output;
+		return [];
 	}
 
 	const fontStrPxMatch = /(\d+)px/.exec(fontStr);
@@ -59,9 +59,24 @@ export const textToDataArr = (
 	}
 
 	if (useCache) {
-		if (Array.isArray(window[cacheKey])) {
-			return window[cacheKey];
+		// @ts-ignore
+		window.charCache = window.charCache || [];
+		// @ts-ignore
+		const cacheVal = window.charCache[cacheKey];
+		if (Array.isArray(cacheVal)) {
+			// Make sure to return copy to avoid mutation of cache
+			return [...cacheVal];
 		}
+	}
+
+	// Edge-case - space character
+	if (chars.length === 1 && chars[0] === ' ') {
+		const dataArr = makeFilledMdArr(Math.round(resolution.w * 0.5), resolution.h, emptyThing);
+		if (useCache) {
+			// @ts-ignore
+			window.charCache[cacheKey] = dataArr;
+		}
+		return dataArr;
 	}
 
 	// Setup a canvas element
@@ -85,7 +100,6 @@ export const textToDataArr = (
 	canvContext.fillRect(0, 0, canvas.width, canvas.height);
 	// Fill text
 	canvContext.fillStyle = 'black';
-	// canvContext.fillText(text, 1, 3, canvas.width);
 	canvContext.fillText(text, 1, 6);
 	// clamped to 255, 4 values (rgba) per pixel
 	const uint8ClampedArr = canvContext.getImageData(0, 0, canvas.width, canvas.height).data;
@@ -102,12 +116,10 @@ export const textToDataArr = (
 		dataArr.push(pixelArr);
 	}
 
-	let emptyThing = 0;
 	if (returnType === 'blackandwhite') {
 		dataArr = rgbaArrToBitArr(dataArr);
 	} else if (returnType === 'greyscale') {
 		dataArr = rgbaArrToGrayscale(dataArr);
-		emptyThing = 255;
 	}
 
 	// Chunk array by width
@@ -116,17 +128,19 @@ export const textToDataArr = (
 
 	// Trim out empty padding
 	dataArr = trimMdArr(dataArr, emptyThing);
-	// Add minimal padding
-	dataArr = padArr(dataArr, OUTPUT_PADDING.w, OUTPUT_PADDING.h, emptyThing);
 
-	output.push(dataArr);
+	// Add minimal padding
+	if (!splitByChar && chars.length > 1) {
+		dataArr = padArr(dataArr, OUTPUT_PADDING.w, OUTPUT_PADDING.h, emptyThing);
+	}
 
 	if (useCache) {
-		window[cacheKey] = output;
+		// @ts-ignore
+		window.charCache[cacheKey] = dataArr;
 		console.log(cacheKey);
 	}
 
-	return output;
+	return dataArr;
 };
 
 /**

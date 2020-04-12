@@ -159,6 +159,10 @@ export const trimMdArr = (mdArr, emptyVal = 0) => {
 		}
 	}
 
+	if (!mdArr.length) {
+		return mdArr;
+	}
+
 	// Assume equal length rows, where mdArr[0].length = mdArr[any].length
 	// Trim cols, starting at left
 	for (let x = 0; x < mdArr[0].length; x++) {
@@ -189,10 +193,16 @@ export const trimMdArr = (mdArr, emptyVal = 0) => {
 };
 
 /**
+ * Pads an array in x and/or y direction
+ *  - Padding is applied equally on both sides of an axis
  * @param {Array<Array<number>>} mdArr
  * @param {any} [padThing]
  */
 export const padArr = (mdArr, padX, padY, padThing = 0) => {
+	if (!mdArr.length) {
+		return mdArr;
+	}
+
 	if (padX) {
 		mdArr.forEach((row) => {
 			let iter = 0;
@@ -216,6 +226,37 @@ export const padArr = (mdArr, padX, padY, padThing = 0) => {
 	}
 
 	return mdArr;
+};
+
+/**
+ *
+ * @param {number[][]} mdArr
+ * @param {number} minHeight
+ * @param {any} padThing
+ */
+export const padMdArrToMinHeight = (mdArr, minHeight, padThing = 0) => {
+	if (!mdArr.length) {
+		mdArr = [padThing];
+	}
+
+	// Assume equal length rows
+	const emptyArr = Array(mdArr[0].length).fill(padThing);
+	let dir = 'top';
+	while (mdArr.length < minHeight) {
+		if (dir === 'top') {
+			mdArr.unshift(emptyArr);
+		} else {
+			mdArr.push(emptyArr);
+		}
+		dir = dir === 'top' ? 'bottom' : 'top';
+	}
+
+	return mdArr;
+};
+
+export const makeFilledMdArr = (length, height, fillVal) => {
+	const row = Array(length).fill(fillVal);
+	return Array(height).fill(row);
 };
 
 // prettier-ignore
