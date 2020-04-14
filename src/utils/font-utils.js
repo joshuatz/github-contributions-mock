@@ -2,7 +2,7 @@ import { chunkArr, trimMdArr, padArr, hashCode, makeFilledMdArr } from './genera
 import { appPrefix } from '../constants';
 
 /**
- *
+ * Crux - converts text input into data array representation
  * @param {string} text Input text
  * @param {'rgba' | 'greyscale' | 'blackandwhite'} [returnType]
  * @param {object} [resolution] Resolution per character
@@ -137,14 +137,13 @@ export const textToDataArr = (
 	if (useCache) {
 		// @ts-ignore
 		window.charCache[cacheKey] = dataArr;
-		console.log(cacheKey);
 	}
 
 	return dataArr;
 };
 
 /**
- *
+ * Converts an rgba array to a binary (0/1) array
  * @param {Array<Array<number>>} rgbaArr
  */
 export const rgbaArrToBitArr = (rgbaArr) => {

@@ -43,13 +43,6 @@ export const ContribGraph = ({ points, colors, emptyVal = 0, margin = 2, animate
 	const maxCols = Math.round(containerSize.width / (rectSize.w + margin));
 	const displayColCount = Math.min(Math.max(pointsColCount, minCols), maxCols);
 	const numMonths = Math.round(displayColCount / COLS_PER_MONTH);
-	// console.log({
-	// 	pointsColCount,
-	// 	minCols,
-	// 	maxCols,
-	// 	displayColCount,
-	// 	numMonths
-	// });
 
 	/** @param {Array<Array<number>>} inputPoints */
 	const pointsToRects = (inputPoints) => {

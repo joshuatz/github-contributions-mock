@@ -13,6 +13,7 @@ export const chunkArr = (arr, chunkLength) => {
 };
 
 /**
+ * Generates a cascading demo pattern (////)
  * @param {number} min
  * @param {number} max
  * @param {number} width
@@ -115,6 +116,7 @@ export const shiftArr = (arr, isMdArr = false, direction = 'right') => {
 };
 
 /**
+ * Trim a MD-Array, removing empty columns and rows
  * @param {Array<Array<number>>} mdArr
  * @param {number} [emptyVal]
  */
@@ -195,7 +197,7 @@ export const trimMdArr = (mdArr, emptyVal = 0) => {
 /**
  * Pads an array in x and/or y direction
  *  - Padding is applied equally on both sides of an axis
- * @param {Array<Array<number>>} mdArr
+ * @param {number[][]} mdArr
  * @param {any} [padThing]
  */
 export const padArr = (mdArr, padX, padY, padThing = 0) => {
@@ -229,7 +231,7 @@ export const padArr = (mdArr, padX, padY, padThing = 0) => {
 };
 
 /**
- *
+ * Pad a Md-Array to a desired height
  * @param {number[][]} mdArr
  * @param {number} minHeight
  * @param {any} padThing
@@ -254,9 +256,23 @@ export const padMdArrToMinHeight = (mdArr, minHeight, padThing = 0) => {
 	return mdArr;
 };
 
+/**
+ * Creates a multi-dimensional array pre-filled with value
+ * @param {number} length
+ * @param {number} height
+ * @param {any} fillVal
+ * @returns {any[][]} filledMdArr
+ */
 export const makeFilledMdArr = (length, height, fillVal) => {
 	const row = Array(length).fill(fillVal);
 	return Array(height).fill(row);
+};
+
+/**
+ * @returns {boolean} isDebug
+ */
+export const getIsDebug = () => {
+	return process.env.NODE_ENV !== 'production';
 };
 
 // prettier-ignore

@@ -3,10 +3,24 @@ import React, { useState, useCallback } from 'react';
 import fontUtils from '../utils/font-utils';
 import { GhIntensityInput } from './GhIntensityInput';
 import { defaultGraphColors } from '../constants';
-import { scaleArr, padArr, padMdArrToMinHeight } from '../utils/general';
+import { scaleArr, padMdArrToMinHeight, getIsDebug, generateDemoPattern } from '../utils/general';
+
+/**
+ * @typedef {object} FormState
+ * @property {boolean} toUpper
+ * @property {string} textInput
+ * @property {boolean} shouldScroll
+ * @property {'rtl' | 'ltr'} scrollDirection
+ * @property {boolean} useTextIntensity
+ * @property {number} fixedIntensity
+ * @property {boolean} processByChar
+ * @property {boolean} processInstantly
+ * @property {boolean} showCanvas
+ */
 
 /** @param {{setGraph: SetGraphParams}} props */
 export const ControlForm = ({ setGraph }) => {
+	/** @type {FormState} */
 	const defaultFormState = {
 		toUpper: true,
 		textInput: 'Welcome! ⚡💎',
@@ -16,7 +30,7 @@ export const ControlForm = ({ setGraph }) => {
 		scrollDirection: ('rtl'),
 		useTextIntensity: true,
 		fixedIntensity: 4,
-		processByChar: true,
+		processByChar: false,
 		processInstantly: true,
 		showCanvas: false
 	};
@@ -36,8 +50,28 @@ export const ControlForm = ({ setGraph }) => {
 		});
 	};
 
+	const generateFromDemo = () => {
+		const demoPattern = generateDemoPattern(0, 4, 300, 10);
+		/** @type {FormState} */
+		const updatedFormState = {
+			...formState,
+			shouldScroll: true,
+			scrollDirection: 'ltr',
+			textInput: '\\ \\ \\ DEMO_PATTERN \\ \\ \\ '
+		};
+		setFormState(updatedFormState);
+		setTimeout(() => {
+			setGraph({
+				colors: defaultGraphColors,
+				points: demoPattern,
+				animate: updatedFormState.shouldScroll,
+				scrollDirection: updatedFormState.scrollDirection,
+				emptyVal: 0
+			});
+		}, 100);
+	};
+
 	const generateFromForm = useCallback(() => {
-		console.log({ formState });
 		/** @type {ColorScales} */
 		let colorScale = 'greyscale';
 		let colors = defaultGraphColors;
@@ -67,8 +101,6 @@ export const ControlForm = ({ setGraph }) => {
 			formState.processByChar
 		);
 
-		console.log({ dataArr });
-
 		if (formState.processByChar && formState.textInput.length) {
 			// Join characters together
 			// First need to find tallest character to determine padding
@@ -81,21 +113,19 @@ export const ControlForm = ({ setGraph }) => {
 				}
 				if (!tempArr.length) {
 					tempArr = charBlock;
-					// console.log(tempArr);
 				} else {
 					for (let x = 0; x < charBlock.length; x++) {
-						// const row = charBlock[x];
-						// console.log(charBlock);
 						tempArr[x] = tempArr[x].concat(charBlock[x]);
 					}
 				}
 			}
-			console.log(tempArr);
 			dataArr = tempArr;
 		}
 
 		const scaledPoints = dataArr ? scaleArr(dataArr, range.min, range.max, true) : [];
-		console.log({ dataArr, scaledPoints });
+		if (getIsDebug()) {
+			console.log({ dataArr, scaledPoints });
+		}
 		setGraph({
 			points: scaledPoints,
 			colors,
@@ -135,7 +165,7 @@ export const ControlForm = ({ setGraph }) => {
 				</div>
 
 				{/* Settings Wrapper */}
-				<div className="row" style={{ minHeight: 134, marginBottom: 0 }}>
+				<div className="row" style={{ minHeight: 100, marginBottom: 0 }}>
 					<div className="col s12 m6">
 						<div className="col s12 m6">
 							<label htmlFor="shouldScroll">
@@ -196,43 +226,14 @@ export const ControlForm = ({ setGraph }) => {
 								<span>Process Instantly</span>
 							</label>
 						</div>
-
-						<div className="col s12 m6">
-							<label>
-								<input
-									type="checkbox"
-									id="processByChar"
-									checked={formState.processByChar}
-									onChange={mapFormChange}
-								/>
-								<span>Process by Character</span>
-							</label>
-						</div>
-
-						<div className="col s12 m6">
-							<label>
-								<input
-									type="checkbox"
-									id="showCanvas"
-									checked={formState.showCanvas}
-									onChange={mapFormChange}
-								/>
-								<span>Show Canvas</span>
-							</label>
-						</div>
-
-						<div className="col s12 m6">
-							<label>
-								<input
-									type="checkbox"
-									id="useTextIntensity"
-									checked={formState.useTextIntensity}
-									onChange={mapFormChange}
-								/>
-								<span>Use intensity of Text</span>
-							</label>
+					</div>
+					<div className="col s12 m6" style={{ display: formState.showCanvas ? 'block' : 'none' }}>
+						<div className="card" style={{ minHeight: 160, padding: 10 }}>
+							<canvas width={500} height={200}></canvas>
 						</div>
 					</div>
+
+					{/* Text intensity slider */}
 					{!formState.useTextIntensity && (
 						<div className="col s12 m6">
 							<GhIntensityInput
@@ -247,12 +248,54 @@ export const ControlForm = ({ setGraph }) => {
 							/>
 						</div>
 					)}
-				</div>
 
-				<div className="col s12 m6" style={{ display: formState.showCanvas ? 'block' : 'none' }}>
-					<div className="card" style={{ minHeight: 160, padding: 10 }}>
-						<canvas width={500} height={200}></canvas>
-					</div>
+					{/* Advanced Settings */}
+					<details className="col s12 m6">
+						<summary>Advanced Settings</summary>
+						<div className="col s12 m6">
+							<label>
+								<input
+									type="checkbox"
+									id="useTextIntensity"
+									checked={formState.useTextIntensity}
+									onChange={mapFormChange}
+								/>
+								<span>Use intensity of Text</span>
+							</label>
+						</div>
+						<div className="col s12 m6">
+							<label>
+								<input
+									type="checkbox"
+									id="showCanvas"
+									checked={formState.showCanvas}
+									onChange={mapFormChange}
+								/>
+								<span>Show Canvas</span>
+							</label>
+						</div>
+						<div className="col s12 m6">
+							<label>
+								<input
+									type="checkbox"
+									id="processByChar"
+									checked={formState.processByChar}
+									onChange={mapFormChange}
+								/>
+								<span>Process by Character</span>
+							</label>
+						</div>
+						<div className="col s12 m6">
+							<button
+								onClick={(evt) => {
+									evt.preventDefault();
+									generateFromDemo();
+								}}
+							>
+								Load demo pattern
+							</button>
+						</div>
+					</details>
 				</div>
 			</form>
 		</div>
