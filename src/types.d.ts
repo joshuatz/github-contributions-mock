@@ -7,6 +7,7 @@ interface ContribGraphProps {
 	margin?: number;
 	animate?: boolean;
 	scrollDirection?: 'ltr' | 'rtl';
+	scrollDelayMs?: number;
 }
 
 type ColorValMap = Record<number, string>;

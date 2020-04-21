@@ -3,7 +3,6 @@ import { monthsAbbr } from '../constants';
 import { shiftArr } from '../utils/general';
 import { useElemSize } from '../utils/hooks';
 
-const ANIMATION_STEP_DELAY_MS = 200;
 const COLS_PER_MONTH = 4;
 const MIN_MONTHS = 6;
 
@@ -29,7 +28,15 @@ const styles = {
 /**
  * @param {ContribGraphProps} props
  */
-export const ContribGraph = ({ points, colors, emptyVal = 0, margin = 2, animate = true, scrollDirection = 'rtl' }) => {
+export const ContribGraph = ({
+	points,
+	colors,
+	emptyVal = 0,
+	margin = 2,
+	animate = true,
+	scrollDirection = 'rtl',
+	scrollDelayMs = 200
+}) => {
 	let animationTimer;
 	const rectSize = { w: 10, h: 10 };
 	const [finPoints, setFinPoints] = useState(points);
@@ -75,7 +82,7 @@ export const ContribGraph = ({ points, colors, emptyVal = 0, margin = 2, animate
 			const shiftDir = scrollDirection === 'ltr' ? 'right' : 'left';
 			const updatedPoints = shiftArr(finPoints, true, shiftDir);
 			setFinPoints([...updatedPoints]);
-		}, ANIMATION_STEP_DELAY_MS);
+		}, scrollDelayMs);
 		animationTimer = timerId;
 	} else if (animationTimer) {
 		clearInterval(animationTimer);

@@ -11,6 +11,7 @@ import { scaleArr, padMdArrToMinHeight, getIsDebug, generateDemoPattern } from '
  * @property {string} textInput
  * @property {boolean} shouldScroll
  * @property {'rtl' | 'ltr'} scrollDirection
+ * @property {number} scrollDelayMs
  * @property {boolean} useTextIntensity
  * @property {number} fixedIntensity
  * @property {boolean} processByChar
@@ -28,6 +29,7 @@ export const ControlForm = ({ setGraph }) => {
 		// prettier-ignore
 		/** @type {'rtl' | 'ltr'} */
 		scrollDirection: ('rtl'),
+		scrollDelayMs: 200,
 		useTextIntensity: true,
 		fixedIntensity: 4,
 		processByChar: false,
@@ -57,6 +59,7 @@ export const ControlForm = ({ setGraph }) => {
 			...formState,
 			shouldScroll: true,
 			scrollDirection: 'ltr',
+			scrollDelayMs: 200,
 			textInput: '\\ \\ \\ DEMO_PATTERN \\ \\ \\ '
 		};
 		setFormState(updatedFormState);
@@ -66,6 +69,7 @@ export const ControlForm = ({ setGraph }) => {
 				points: demoPattern,
 				animate: updatedFormState.shouldScroll,
 				scrollDirection: updatedFormState.scrollDirection,
+				scrollDelayMs: updatedFormState.scrollDelayMs,
 				emptyVal: 0
 			});
 		}, 100);
@@ -130,7 +134,8 @@ export const ControlForm = ({ setGraph }) => {
 			points: scaledPoints,
 			colors,
 			animate: formState.shouldScroll,
-			scrollDirection: formState.scrollDirection
+			scrollDirection: formState.scrollDirection,
+			scrollDelayMs: formState.scrollDelayMs
 		});
 	}, [formState, setGraph]);
 
@@ -252,6 +257,20 @@ export const ControlForm = ({ setGraph }) => {
 					{/* Advanced Settings */}
 					<details className="col s12 m6">
 						<summary>Advanced Settings</summary>
+						{formState.shouldScroll && (
+							<div className="col s12 range-field valign-wrapper">
+								<input
+									id="scrollDelayMs"
+									type="range"
+									min="10"
+									max="2000"
+									step={10}
+									value={formState.scrollDelayMs}
+									onChange={mapFormChange}
+								/>
+								<label>{`Scroll Speed (${formState.scrollDelayMs} MS per frame)`}</label>
+							</div>
+						)}
 						<div className="col s12 m6">
 							<label>
 								<input
