@@ -33,11 +33,14 @@ export const ContribGraph = ({
 	colors,
 	emptyVal = 0,
 	margin = 2,
-	animate = true,
+	animate = false,
 	scrollDirection = 'rtl',
 	scrollDelayMs = 200
 }) => {
-	let animationTimer;
+	let animationTimerRef = React.useRef(null);
+	let shouldAnimateRef = React.useRef(animate);
+	let animationFuncRef = React.useRef(null);
+	let lastAnimationPaintMs = new Date().getTime();
 	const rectSize = { w: 10, h: 10 };
 	const [finPoints, setFinPoints] = useState(points);
 	/** @type {React.MutableRefObject<SVGSVGElement>} */
@@ -77,28 +80,80 @@ export const ContribGraph = ({
 		});
 	};
 
-	if (animate) {
-		const timerId = setInterval(() => {
-			const shiftDir = scrollDirection === 'ltr' ? 'right' : 'left';
-			const updatedPoints = shiftArr(finPoints, true, shiftDir);
-			setFinPoints([...updatedPoints]);
-		}, scrollDelayMs);
-		animationTimer = timerId;
-	} else if (animationTimer) {
-		clearInterval(animationTimer);
-	}
-
-	useEffect(() => {
-		return function cleanup() {
-			if (animationTimer) {
-				clearInterval(animationTimer);
-			}
-		};
-	});
-
 	useEffect(() => {
 		setFinPoints(points);
 	}, [points]);
+
+	const performAnimation = () => {
+		if (shouldAnimateRef.current) {
+			console.log('animate = true, running');
+			console.log(shouldAnimateRef.current);
+			setTimeout(() => {
+				console.log('requesting new frame');
+				animationTimerRef.current = requestAnimationFrame(performAnimation);
+			}, scrollDelayMs);
+
+			// const nowMs = new Date().getTime();
+			// const elapsedMsSinceLastPaint = nowMs - lastAnimationPaintMs;
+			// if (elapsedMsSinceLastPaint >= scrollDelayMs) {
+			const shiftDir = scrollDirection === 'ltr' ? 'right' : 'left';
+			const updatedPoints = shiftArr(finPoints, true, shiftDir);
+			setFinPoints([...updatedPoints]);
+			// lastAnimationPaintMs = nowMs;
+			// }
+			// animationTimer = requestAnimationFrame(performAnimation);
+		} else if (animationTimerRef.current) {
+			cancelAnimationFrame(animationTimerRef.current);
+			animationTimerRef.current = null;
+		}
+	};
+
+	// const performAnimationCb = React.useCallback(() => {
+	// 	performAnimation();
+	// }, []);
+
+	// useEffect(() => {
+	// 	console.log(`Animate changed. animate = ${animate}`);
+	// 	shouldAnimateRef.current = animate;
+
+	// 	return function cleanup() {
+	// 		if (animationTimerRef.current) {
+	// 			cancelAnimationFrame(animationTimerRef.current);
+	// 		}
+	// 	};
+	// }, [animate]);
+
+	// React.useLayoutEffect(() => {
+	// 	animationTimerRef.current = requestAnimationFrame(performAnimation);
+
+	// 	return function cleanup() {
+	// 		if (animationTimerRef.current) {
+	// 			cancelAnimationFrame(animationTimerRef.current);
+	// 		}
+	// 	};
+	// }, []);
+
+	React.useEffect(() => {
+		shouldAnimateRef.current = animate;
+		animationFuncRef.current = () => {
+			if (shouldAnimateRef.current) {
+				console.log('animate = true, running');
+				console.log(shouldAnimateRef.current);
+				setTimeout(() => {
+					console.log('requesting new frame');
+					animationTimerRef.current = requestAnimationFrame(animationFuncRef.current);
+				}, scrollDelayMs);
+
+				const shiftDir = scrollDirection === 'ltr' ? 'right' : 'left';
+				const updatedPoints = shiftArr(finPoints, true, shiftDir);
+				setFinPoints([...updatedPoints]);
+			} else if (animationTimerRef.current) {
+				cancelAnimationFrame(animationTimerRef.current);
+				animationTimerRef.current = null;
+			}
+		};
+		animationFuncRef.current();
+	}, [animate, finPoints, scrollDelayMs, scrollDirection]);
 
 	return (
 		<div style={{ padding: 10 }}>
